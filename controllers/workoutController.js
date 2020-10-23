@@ -5,36 +5,57 @@ const path = require('path');
 
 
 
-router.get('/exercise',function(req,res){
-    
-    res.sendFile(path.join(__dirname, "../public/exercise.html"));
-    //__dirname : It will resolve to your project folder.
-  });
+router.get('/exercise', function (req, res) {
 
-  router.get('/stats',function(req,res){
-    
+    res.sendFile(path.join(__dirname, "../public/exercise.html"));
+
+});
+
+router.get('/stats', function (req, res) {
+
     res.sendFile(path.join(__dirname, "../public/stats.html"));
-    //__dirname : It will resolve to your project folder.
-  });
+
+});
+
+router.get("/", function (req, res) {
+
+    res.sendFile(path.join(__dirname, "../public/index.html"));
+
+});
 //=======================================================================================
 
-router.get("/api/workouts/range", (req,res)=>{
-    console.log("dates: " + new Date + " "  + new Date(new Date().setDate(new Date().getDate() - 7)));
+router.get("/api/workouts/range", (req, res) => {
+    console.log("dates: " + new Date + " " + new Date(new Date().setDate(new Date().getDate() - 7)));
 
-    db.Workout.find({day:{'$lte':new Date(),'$gte':new Date(new Date().setDate(new Date().getDate() - 7))}})    
-    .then((workouts) => {
-        console.log(workouts);
-        res.json(workouts);
-    })
-    .catch(err => {
-        console.log(err);
-        res.json({
-            error: true,
-            data: null,
-            message: "Failed to retrieve workouts within range"
+    db.Workout.find({ day: { '$lte': new Date(), '$gte': new Date(new Date().setDate(new Date().getDate() - 7)) } })
+        .then((workouts) => {
+            console.log(workouts);
+            res.json(workouts);
+        })
+        .catch(err => {
+            console.log(err);
+            res.json({
+                error: true,
+                data: null,
+                message: "Failed to retrieve workouts within range"
+            });
+
         });
 
-    });
+    // db.Workout.find({}).limit(7)
+    //     .then((workouts) => {
+    //         console.log(workouts);
+    //         res.json(workouts);
+    //     })
+    //     .catch(err => {
+    //         console.log(err);
+    //         res.json({
+    //             error: true,
+    //             data: null,
+    //             message: "Failed to retrieve workouts"
+    //         });
+
+    //     });
 
 });
 
@@ -88,6 +109,33 @@ router.post("/api/workouts", (req, res) => {
 
 
 router.put("/api/workouts/:id", (req, res) => {
+
+    // validating exercise before pushing to data base
+    const exercise = req.body;
+    console.log("Exercise: " + exercise);
+
+    if (exercise.type === "resistance") {
+        if (exercise.name === "" && exercise.duration === 0 && exercise.weight === 0 && exercise.reps === 0 && exercise.sets === 0) {
+            console.log("Unable to update workout. Invalid Values");
+            return res.json({
+                error: true,
+                data: null,
+                message: "Unable to update workout. Invalid Values"
+            });
+        }
+    }
+    else if (exercise.type === "cardio") {
+        if (exercise.name === "" && exercise.duration === 0 && exercise.distance === 0) {
+            console.log("Unable to update workout. Invalid Values");
+            return res.json({
+                error: true,
+                data: null,
+                message: "Unable to update workout. Invalid Values"
+            });
+        }
+
+    }
+
     db.Workout.findByIdAndUpdate(req.params.id, {
 
         "$push": { "exercises": req.body }
