@@ -30,24 +30,9 @@ router.get("/", function (req, res) {
  */
 
 router.get("/api/workouts/range", (req, res) => {
-    console.log("dates: " + new Date + " " + new Date(new Date().setDate(new Date().getDate() - 7)));
+    // console.log("dates: " + new Date + " " + new Date(new Date().setDate(new Date().getDate() - 7)));
 
-    db.Workout.find({ day: { '$lte': new Date(), '$gte': new Date(new Date().setDate(new Date().getDate() - 7)) } })
-        .then((workouts) => {
-            console.log(workouts);
-            res.json(workouts);
-        })
-        .catch(err => {
-            console.log(err);
-            res.json({
-                error: true,
-                data: null,
-                message: "Failed to retrieve workouts within range"
-            });
-
-        });
-
-    // db.Workout.find({}).limit(7)
+    // db.Workout.find({ day: { '$lte': new Date(), '$gte': new Date(new Date().setDate(new Date().getDate() - 7)) } })
     //     .then((workouts) => {
     //         console.log(workouts);
     //         res.json(workouts);
@@ -57,10 +42,25 @@ router.get("/api/workouts/range", (req, res) => {
     //         res.json({
     //             error: true,
     //             data: null,
-    //             message: "Failed to retrieve workouts"
+    //             message: "Failed to retrieve workouts within range"
     //         });
 
     //     });
+
+    db.Workout.find({}).limit(7)
+        .then((workouts) => {
+            console.log(workouts);
+            res.json(workouts);
+        })
+        .catch(err => {
+            console.log(err);
+            res.json({
+                error: true,
+                data: null,
+                message: "Failed to retrieve workouts"
+            });
+
+        });
 
 });
 
