@@ -4,7 +4,7 @@ const db = require("../models");
 const path = require('path');
 
 
-
+//===========================HTML ROUTES===========================================================
 router.get('/exercise', function (req, res) {
 
     res.sendFile(path.join(__dirname, "../public/exercise.html"));
@@ -22,7 +22,12 @@ router.get("/", function (req, res) {
     res.sendFile(path.join(__dirname, "../public/index.html"));
 
 });
-//=======================================================================================
+//====================================API ROUTES===================================================
+
+/***
+ * 
+ * GET THE WORKOUTS RANGE
+ */
 
 router.get("/api/workouts/range", (req, res) => {
     console.log("dates: " + new Date + " " + new Date(new Date().setDate(new Date().getDate() - 7)));
@@ -59,6 +64,10 @@ router.get("/api/workouts/range", (req, res) => {
 
 });
 
+
+/**
+ * GET ALL THE WORKOUTS - GET ALL 
+ */
 router.get("/api/workouts", function (req, res) {
 
     db.Workout.find({})
@@ -77,6 +86,9 @@ router.get("/api/workouts", function (req, res) {
         });
 
 });
+/**
+ * GET WORKOUT WITH ID - GET ONE 
+ */
 
 router.get("api/workouts/:id", (req, res) => {
 
@@ -93,6 +105,9 @@ router.get("api/workouts/:id", (req, res) => {
         });
 });
 
+/***
+ * CREATE NEW WORKOUT  - POST
+ */
 router.post("/api/workouts", (req, res) => {
     db.Workout.create(req.body).then((newWorkout) => {
         res.json(newWorkout);
@@ -107,9 +122,12 @@ router.post("/api/workouts", (req, res) => {
     });
 });
 
-
+/**
+ *  UPDATE WORKOUT WITH NEW EXERCISE - PUT
+ */
 router.put("/api/workouts/:id", (req, res) => {
 
+    // VALIDATE EXERCISE
     // validating exercise before pushing to data base
     const exercise = req.body;
     console.log("Exercise: " + exercise);
@@ -136,6 +154,7 @@ router.put("/api/workouts/:id", (req, res) => {
 
     }
 
+    // ADD EXERCISE TO WORKOUT
     db.Workout.findByIdAndUpdate(req.params.id, {
 
         "$push": { "exercises": req.body }
